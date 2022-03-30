@@ -1,0 +1,378 @@
+---
+title: "Functions and For Loops"
+author: "Clemens S. Heithecker"
+subtitle: Module 5
+output:
+  html_document:
+    df_print: paged
+---
+
+# Setup
+
+In this module we use the tidyverse package to manipulate data frames.
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+```
+
+# Functions
+
+In programming, functions are used to automate or repeat common tasks.
+
+A function can have multiple **arguments**. For example the `mean()` function
+accepts three arguments:
+
+- `x` which is a vector of numbers for which to calculate the mean
+- `trim` which is an *optional argument* to specify numbers to be ignored when
+calculating the mean
+- `na.rm` which is again an *optional argument* indicating whether missing
+values should be removed before calculating the mean
+
+The arguments of a function are documented in the functions documentation. Here
+you can find more information about the function including examples. You can
+access the documentation of a function by writing a question mark in front of
+it.
+
+```{r}
+?mean
+```
+
+Note that the arguments `trim` and `na.rm` both have a default value (`0` and
+`FALSE` respectively). This means the arguments are **optional** and don't need
+to be specified when using the function.
+
+For example:
+
+```{r}
+vector <- c(1, 2, 3, NA)
+
+mean(vector)
+mean(vector, na.rm = FALSE)
+mean(vector, na.rm = TRUE)
+```
+
+## Exercise 1—Arguments of a Function
+
+What are the arguments for the `sum()` function and which arguments are required
+and which ones optional?
+
+```{r}
+?sum
+
+# Required arguments
+# - a vector of numeric, complex or logical values
+
+# Optional arguments
+# - na.rm indicating whether missing values should be removed before calculating
+# the sum
+```
+
+## Exercise 2—Predicting the Output of a Function
+
+Look up the arguments of the `log()` function. Then, predict which of the
+following calls does not return an error:
+
+- `log(x = 100, 10)`
+- `log(100)`
+- `log(base = exp(1))`
+- `log(exp(1) ^ 3, exp(1))`
+- `log(base = 10, x = 100)`
+
+```{r}
+# Required arguments of the log() function:
+# - x
+
+# Optional arguments of the log() function:
+# - base (defaults to exp(1))
+
+# This function should work as the required argument is provided and base is
+# given as a second argument
+log(x = 100, 10)
+
+# This function should work because the required argument x is provided
+log(100)
+
+# This function should not work because x is not given
+# log(base = exp(1))
+
+# This function should work as both x and base are implicitly provided
+log(exp(1) ^ 3, exp(1))
+
+# This function should work because both arguments are explicitly provided which
+# is important because of the altered order
+log(base = 10, x = 100)
+```
+
+
+The key takeaway from this exercise is that the order of the arguments provided
+matters when the specific arguments used are not explicitly specified
+(`log(100)` instead of `log(x = 100)`).
+
+# Creating a Custom Function
+
+We can create our own function using the `function` command. Let's make a
+function that accepts a vector `x` and returns the square of the vector.
+
+```{r}
+square <- function(x) {
+  x * x
+}
+```
+
+The function `square` returns the square of the elements of an input vector `x`:
+
+```{r}
+square(2)
+
+a <- 3
+square(a)
+
+b <- c(1, 3)
+square(b)
+```
+
+`R` treats all variables as vectors as the example above shows.
+
+Just like the `mean()` and the `log()` functions we examined above, we can pass
+multiple arguments to our custom function.
+
+```{r}
+square_plus <- function(x, y = 1) {
+  x * x + y
+}
+
+square_plus(3, 6)
+
+square_plus(3)
+```
+
+The function above takes in two *input* variables and returns a single *output*.
+Thereby the argument`x` is required and `y` optional which defaults to 1 if it
+is not explicitly specified.
+
+## Exercise 3—Writing a Custom Function
+
+Create a function called `paste_together` that takes two variables as *input*
+and pastes them together with the R base function `paste`.
+
+```{r}
+paste_together <- function(x, y) {
+  # This function pastes two strings together
+  
+  paste(x, y)
+}
+
+# Testing the function
+paste_together("house number", 45)
+paste_together("letter", LETTERS)
+```
+
+# The For Loop
+
+According to [Wikipedia](https://en.wikipedia.org/wiki/For_loop):
+
+> In computer science, a for-loop (or simply for loop) is a control flow
+statement for specifying iteration, which allows code to be executed repeatedly.
+[...]
+
+> A for-loop has two parts: a header specifying the iteration, and a body which
+is executed once per iteration. The header often declares an explicit loop
+counter or loop variable, which allows the body to know which iteration is being
+executed. For-loops are typically used when the number of iterations is known
+before entering the loop.
+
+For example:
+
+```{r}
+for (i in 1:10) {
+  print(i)
+}
+```
+
+## Exercise 4—Using a For Loop
+
+Create a function that calls the function `squared_plus()` from before for the
+numbers `x` to `x + 10` and adds the results returning the total.
+
+```{r}
+loop_function <- function(x) {
+  total <- 0
+  
+  for (i in x:(x + 10)) {
+    total <- total + square_plus(i)
+  }
+  
+  return(total)
+}
+
+# Testing the function
+loop_function(2)
+```
+
+## Exercise 5—A Function to Calcuate the Variance
+
+The variance of a set of numbers $X$ is a **statistic** (a number that is
+derived from other numbers using a statistical procedure or algorithm) that
+quantifies the amount of spread in the values. Informally, it measures how far a
+set of numbers is spread out from its average value.
+
+$$
+\text{Variance}(X) = \text{Mean}(X^2) - (\text{Mean}(X))^2
+$$
+
+Create a function that calculates the variance of a numeric vector.
+
+```{r}
+variance <- function(x) {
+  mean(x ^ 2) - mean(x) ^ 2
+}
+```
+
+Test the function on the vector `vec`. It should return the same answers as the
+built-in base R `var` function after applying the *Bessels correction*. This
+correction is simply multiplying the answer by $N/(N+1)$, where $N$ is the
+length of `vec` (i.e. the number of values in `vec`).
+
+```{r}
+vec <- c(2, 4, 3, 6)
+
+N <- length(vec)
+corr <- N / (N - 1)
+
+result <- variance(vec) * corr
+result
+
+test <- var(vec)
+test
+
+result == test
+```
+
+# When Should I Use Functions?
+
+**Code repetition** is a good signal for when to use a function. As soon as you
+start copying and re-using code it makes sense to turn that chunk of code into a
+function.
+
+For example, suppose we are interested in global exports of clothing in 2018.
+Which countries are the top exporting countries and to which countries do they
+export to?
+
+## Exercise 6—Loading the Data
+
+Load the `trade.rds` data set using `readRDS()`. Then, filter all entries from
+the year 2018. How many distinct countries does the data set contain?
+
+```{r}
+trade_2018 <- readRDS("data/trade.rds") %>%
+  filter(year == 2018)
+
+head(trade_2018)
+
+length(unique(trade_2018$reporter_iso))
+```
+
+Let's start by analyzing China which is the country with the largest clothing
+exports.
+
+```{r fig.width = 10, fig.height = 5}
+temp <- trade_2018 %>%
+  # Select China as the reporter
+  filter(reporter_iso == "chn") %>%
+  # Group by year
+  group_by(year) %>%
+  # Select the 5 largest trading partners with China measured by the export
+  # value in USD
+  slice_max(order_by = export_value_usd, n = 5)
+
+# Extract the country names from the data set
+country_name <- unique(temp$reporter_fullname_english)
+
+plot_title <- paste("Top Five Countries that",
+                    country_name,
+                    "Exports Clothing To")
+
+ggplot(data = temp, mapping = aes(x = reorder(partner_fullname_english,
+                                              export_value_usd),
+                                  y = export_value_usd)) +
+  geom_point() +
+  expand_limits(y = 0) +
+  ggtitle(plot_title) +
+  xlab("Importing Country") +
+  ylab("Exporting Value (Billon US Dollar)") +
+  coord_flip()
+```
+
+Suppose we want to make a similar plot for a list of countries. Let's say we are
+interested in India (*ind*), Bangladesh (*bgd*), Italy (*ita*) and
+Germany (*deu*) in addition to China.
+
+Let's turn the code that generates the plot into a function.
+
+## Exercise 7—Using a Function to Plot Data
+
+Turn the previous code chunk into a function that takes the data set and a
+country code as arguments and creates a plot similar to the one above for the
+supplied country.
+
+```{r}
+plot_top_five_partner_countries <- function(df, country_code) {
+  temp <- df %>%
+  # Select the provided country as the reporter
+  filter(reporter_iso == country_code) %>%
+  # Group by year
+  group_by(year) %>%
+  # Select the 5 largest trading partners measured by the export value in USD
+  slice_max(order_by = export_value_usd, n = 5)
+
+  # Extract the country names from the data set
+  country_name <- unique(temp$reporter_fullname_english)
+
+  plot_title <- paste("Top Five Countries that",
+                      country_name,
+                      "Exports Clothing To")
+
+  ggplot(data = temp, mapping = aes(x = reorder(partner_fullname_english,
+                                                export_value_usd),
+                                    y = export_value_usd)) +
+    geom_point() +
+    expand_limits(y = 0) +
+    ggtitle(plot_title) +
+    xlab("Importing Country") +
+    ylab("Exporting Value (Billon US Dollar)") +
+    coord_flip()
+}
+```
+
+Let's see if it works by creating the plot for Germany.
+
+```{r}
+plot_top_five_partner_countries(trade_2018, country_code = "deu")
+```
+
+Now we can use a for loop to plot every country in a given vector.
+
+```{r}
+countries <- c("bgd", "chn", "deu", "ind", "ita")
+```
+
+
+## Exercise 8—A Plot for Every Country
+
+Write a for loop that calls the `plot_top_five_partner_countries()` function for
+each country in `countries`. Use the `length()` function to obtain the number of
+times the loop needs to be executed.
+
+```{r}
+for (country in 1:length(countries)) {
+  print(
+    plot_top_five_partner_countries(df = trade_2018,
+                                    country_code = countries[country])
+  )
+}
+```
+
+# Further Readings
+
+- [A Tutorial on Using Functions in R! - DataCamp](https://www.datacamp.com/community/tutorials/functions-in-r-a-tutorial)
+- [Functions - R for Data Science](https://r4ds.had.co.nz/functions.html)

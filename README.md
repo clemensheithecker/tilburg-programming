@@ -6,6 +6,7 @@ I took these notes when taking the course _Programming in R and Python_ at [Tilb
 
 This repository is sectioned into several modules by topic:
 
+- [Module 4](/module-4/)—Functions
 - [Module 5](/module-5/)—Simulation-Based Statistics
 
 ## Additional Resources
