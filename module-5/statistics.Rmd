@@ -1,0 +1,180 @@
+---
+title: "Simulation-Based Statistics"
+author: "Clemens S. Heithecker"
+subtitle: Module 5
+output:
+  html_document:
+    df_print: paged
+---
+
+# Setup
+
+In this module we use the tidyverse package to manipulate data frames.
+
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+```
+
+# Statistical Testing vs. Simulation
+
+Performing **statistical simulations** to gain statistical insights have become possible with faster computers and better software. Statistically simulating means repeatedly generating artificial data giving a model or assumptions and analyzing the outcomes. These simulations can be an alternative to performing traditional  **statistical tests**.
+
+# Probability
+
+Data analysis often involves an element of chance leading to uncertainty when drawing conclusions.
+
+For example, suppose we ask 30 students from the Netherlands to report their height and gender. Their answers are recorded in `height-survey.csv`.
+
+```{r}
+survey <- read.csv("data/height-survey.csv")
+
+survey
+```
+
+We want to know if there is a structural difference in heights when comparing female with male students.
+
+Let's start off by using descriptive statistics to analyze the data.
+
+## Exercise 1—A Histogram
+
+Plot a histogram of all heights in the data set independent of gender.
+
+```{r}
+ggplot(data = survey) +
+  geom_histogram(mapping = aes(x = height),
+                 bins = 6)
+```
+
+Then, plot a histogram using `facet_wrap()` for each gender separately.
+
+```{r}
+ggplot(data = survey) +
+  geom_histogram(mapping = aes(x = height),
+                 # The number of bins
+                 bins = 6) +
+  facet_wrap(~gender)
+```
+
+Finally, calculate the mean height by gender group.
+
+```{r}
+survey %>%
+  group_by(gender) %>%
+  summarise(mean_height = mean(height))
+```
+
+The data shows that on average female students in the survey data are shorter compared to male students. But to draw a statistical conclusion, we should use a statistical model.
+
+[Wikipedia](https://en.wikipedia.org/wiki/Statistical_model) defines a statistical model as
+
+>[...] a mathematical model that embodies a set of statistical assumptions concerning the generation of sample data (and similar data from a larger population). A statistical model represents, often in considerably idealized form, the data-generating process.
+
+For our idealized statistical model we will use a normal distribution.
+
+# The Normal Distribution
+
+For data which is spread out around a central location it is useful to assume that the data follows a normal distribution
+
+The normal distribution is described using two parameters:
+
+- the **central location** (or the **mean**)
+- and the amount of **spread** around the central location
+
+The spread of a set of numbers can be calculated by the **standard deviation** (SD).
+
+## Exercise 2—Standard Deviation
+
+Calculate the center location (mean) and the amount of spread in the heights. Use the `sd()` function to calculate the standard deviation.
+
+```{r}
+mean <- mean(survey$height)
+sd <- sd(survey$height)
+
+print(c(mean = mean, sd = sd))
+```
+
+We can simulate data from a normal distribution using the `rnorm()` function in R.
+
+Let's simulate a large data set of fake height values. To ensure we obtain the same set of random numbers each time we run the code, we use the `set.seed()` function.
+
+## Exercise 3—Sampling Values from a Normal Distribution
+
+Generate 10,000 values from a normal distribution with mean 181 and a standard deviation of 10. Then, plot a histogram of these numbers.
+
+```{r}
+set.seed(2022)
+
+artificial_heights <- rnorm(n = 10000, mean = 181, sd = 10)
+
+ggplot() +
+  geom_histogram(mapping = aes(x = artificial_heights),
+                 # The width of the bins
+                 binwidth = 5)
+```
+
+# A Simple Height Model
+
+Let's make a simple model of heights and compare the simulated data from the model with the observed data from the survey.
+
+For the simple model assume no structural differences in height between female and male students.
+
+We already know that the survey height data has matching characterizes to a the normal distribution. In other words, we observe a central location with symmetric spead and no extreme values.
+
+## Exercise 4—Drawing from a Normal Distribution
+
+Simulate 10 data points from a normal distribution with mean and standard deviation equal to the observed heights. Then, calculate the mean for the generated data points.
+
+```{r}
+set.seed(2022)
+
+simulation <- rnorm(n = 10,
+               mean = mean(survey$height),
+               sd = sd(survey$height))
+
+mean(simulation)
+```
+
+## Exercise 5—Simulating 10,000 Times
+
+Now write a **for loop** to execute the code from the previous exercise 10,000 times. Store all values of `mean(simulation)` in a vector `mean_siumulation`. With that, we end up with 10,000 mean values, all from different simulation runs, but from the same underlying model. Finally, plot a histogram of the 10,000 means.
+
+```{r}
+# Define an empty vector
+simulation_means <- c()
+
+# Run for loop 10,000 times
+for (i in 1:10000) {
+  # Add the mean of the generated data points to the vector
+  simulation_means[i] <- mean(
+    # Randomly generate 10 normally distributed data points
+    rnorm(n = 10,
+          mean = mean(survey$height),
+          sd = sd(survey$height))
+  )
+}
+
+ggplot() +
+  geom_histogram(mapping = aes(x = simulation_means),
+                 binwidth = 1)
+```
+
+# Comparing the Model with the Observed Data
+
+## Exercise 6—Adding Mean Lines
+
+Add red vertical lines for the group averages from exercise 2 to the histogram from the previous exercise. Use `geom_vline()` for this.
+
+```{r}
+mean_female <- mean(survey[survey$gender == "F", "height"])
+mean_male <- mean(survey[survey$gender == "M", "height"])
+
+ggplot() +
+  geom_histogram(mapping = aes(x = simulation_means),
+                 binwidth = 1) +
+  geom_vline(mapping = aes(xintercept = mean_female),
+             color = "red") +
+  geom_vline(mapping = aes(xintercept = mean_male),
+             color = "red")
+```
+
+The model suggests group-specific heights for female and male students. Although both the female and the male mean values fall within the range of plausible values in the situation without a gender difference, they lie towards the opposite ends of the distribution.
