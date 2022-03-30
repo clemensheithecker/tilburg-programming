@@ -1,6 +1,6 @@
 # Introduction to Programming Notes
 
-I took these notes when taking the course _Programming in R and Python_ at [Tilburg University](https://www.tilburguniversity.edu/) as an undergraduate Economics student.
+I took these notes and solved the exercises in the notebooks when taking the course _Programming in R and Python_ at [Tilburg University](https://www.tilburguniversity.edu/) as an undergraduate Economics student.
 
 ## Modules
 
