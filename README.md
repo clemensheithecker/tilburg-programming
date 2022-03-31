@@ -1,12 +1,13 @@
 # Programming in R and Python Course Notes
 
-I took these notes and solved the exercises in the notebooks when taking the course _Programming in R and Python_ at [Tilburg University](https://www.tilburguniversity.edu/) as an undergraduate Economics student.
+This respository contains my notes and solved exercises from the course _Programming in R and Python_ at [Tilburg University](https://www.tilburguniversity.edu/) which I took as an undergraduate economics student.
 
 ## Modules
 
 This repository is sectioned into several modules by topic:
 
-- [Module 3](/module-3/)—Data Wrangling
+- [Module 2](/module-2/)—Data Wrangling with dplyr
+- [Module 3](/module-3/)—Data Wrangling (merging and wide-long transformations)
 - [Module 4](/module-4/)—Functions
 - [Module 5](/module-5/)—Simulation-Based Statistics
 

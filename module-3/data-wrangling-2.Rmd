@@ -1,5 +1,5 @@
 ---
-title: "Data Wrangling"
+title: "Data Wrangling—Merging and Wide-Long Transformations"
 author: "Clemens S. Heithecker"
 subtitle: Module 3
 output:
