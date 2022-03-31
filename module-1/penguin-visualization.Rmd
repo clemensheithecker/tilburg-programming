@@ -1,0 +1,221 @@
+---
+title: "Penguin Visualization"
+author: "Clemens S. Heithecker"
+subtitle: "Module 1"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Setup
+
+In this module we use the tidyverse package to manipulate data frames. We will
+also use the palmerpenguins package which includes data about penguins.
+
+```{r message = FALSE, warning = FALSE}
+library(palmerpenguins)
+library(tidyverse)
+```
+
+*Note*: You can install packages using the `install.packages("palmerpenguins")`
+command.
+
+# Data
+
+We can now access the data by typing the command `data("penguins")`. In the top-
+right area of the RStudio screen under the tap "Environment" we can see two data
+sets.
+
+- *penguins* with 344 observations and 8 variables
+- *penguins_raw* with 344 observations and 17 variables
+
+We will only use the first data set (penguins). Take a look at the data set by
+double clicking on the `penguins` data set in the environment or by using the
+following commands:
+
+- `View(penguins)` which opens the data frame
+- `head(penguins)` which outputs the top 5 rows of the data set
+- `tail(penguins)` which outputs the bottom 5 rows of the data set
+- `summary(penguins)` which ouputs a table of summary statistics
+
+```{r}
+data("penguins")
+
+head(penguins)
+tail(penguins)
+```
+
+```{r}
+summary(penguins)
+```
+
+The data set contains 8 variables and 344 individual penguins. If you want to
+know what all variables mean you can use the command `?penguins` to inspect the
+documentation.
+
+```{r}
+?penguins
+```
+
+There are some `NA` or missing values in the data set. We can remove those
+observations using the following code:
+
+```{r}
+penguins <- penguins %>%
+  na.omit()
+```
+
+Now the number of observations decreased to 333 meaning we lost 11 penguins.
+
+# Plotting Data
+
+In 2005  Hadley Wickham created ggplot as part of his PhD. `ggplot` is a part of
+the tidyverse package and allows you to plot anything you can imagine.
+
+Any plot in ggplot has (at least) the following parts:
+
+- the command `ggplot()` which tells R to plot.
+- a `geom_` that tells ggplot which type of graph should be created. Examples are
+
+  - `geom_point()` for a scatter plot
+  - `geom_line()` for a line graph
+  - `geom_bar()` for a bar plot
+  - `geom_histogram()` for a histogram
+  - `geom_boxplot()`
+
+We need to specify how to plot the variables in our graph. In ggplot we can link
+an **aesthetic** of a graph to a column in a data frame. Examples include
+
+- x-coordinate
+- y-coordinate
+- size and shape of points
+- fill color
+- line color
+- line size
+- transparency (alpha value)
+- line type
+
+You can specify the aesthetic within the `ggplot()` function call or the
+`geom_`. It is often easier to use the aesthetics argument within the `geom_`
+call especially when dealing with multiple `geom_` in one plot.
+
+## Scatter Plot
+
+Suppose we are interested in the correlation between flipper length and bill
+length. We assume that animals with a larger flipper will also have a larger
+bill.
+
+We can plot the data using a scatter plot `geom_scatter()`.
+
+```{r}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = flipper_length_mm, y = bill_length_mm))
+```
+
+## Adding Color to the Plot
+
+We could experiment with adding colors and shapes to this plot. Let's make the
+points of the scatter plot red, 3 times bigger and change the shape.
+
+```{r}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = flipper_length_mm, y = bill_length_mm),
+             color = "red", size = 3, shape = 1)
+```
+
+Because we added the color, size and shape attributes outside the `aes()`
+function we apply the same attributes to all data points.
+
+## Adding Dimensions of Species and Sex
+
+It seems that there is a positive correlation between flipper and bill length.
+Let's examine if there are group differences between sex and species. In our
+next plot we will add an aesthetic `color` for species and `shape` for sex to
+our plot. We should do this inside the `aes()` function because we now want to
+make the color and the shape dependent on the variables `species` and `sex`.
+
+```{r}
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = bill_length_mm)) +
+  geom_point(mapping = aes(color = species, shape = sex),
+             size = 3)
+```
+
+## Improving the Plot
+
+We can make the plot nicer by adding labels with `labs()`. We can add
+
+- a title
+- a subtitle
+- an x-axis label
+- a y-axis label
+- a caption
+
+We can also add a theme. Check out some examples at
+[https://ggplot2.tidyverse.org/reference/ggtheme.html](https://ggplot2.tidyverse.org/reference/ggtheme.html).
+
+```{r}
+ggplot(data = penguins,
+       mapping = aes(x = flipper_length_mm, y = bill_length_mm)) +
+  geom_point(size = 3,
+             mapping = aes(color = species, shape = sex)) +
+  labs(
+    title = "Bill length vs flipper length",
+    subtitle = "Clemens S. Heithecker",
+    x = "Flipper length (mm)",
+    y = "Bill length (mm)",
+    caption = "Source: Penguins"
+  ) +
+  theme_bw()
+```
+
+# Box Plots
+
+Let's make a box plot.
+
+```{r}
+ggplot(data = penguins, mapping = aes(x = species, y = body_mass_g)) +
+  geom_boxplot(mapping = aes(fill = sex)) +
+  labs(
+    x = "Species",
+    y = "Body mass in grams"
+  )
+```
+
+We could also add another dimension by making a plot per island. With this plot
+we are able to see which species lives on which island and whether species
+living on different islands have different body masses. We can split the plots
+per island by using the `facet_wrap(~ island)`.
+
+```{r}
+ggplot(data = penguins, mapping = aes(x = species, y = body_mass_g)) +
+  geom_boxplot(mapping = aes(fill = sex)) +
+  facet_wrap(~ island) +
+  labs(
+    x = "Species",
+    y = "Body mass in grams"
+  )
+```
+
+Let's change the colors of the `sex` variable.
+
+```{r}
+ggplot(data = penguins, mapping = aes(x = species, y = body_mass_g)) +
+  geom_boxplot(mapping = aes(fill = sex)) +
+  facet_wrap(~ island) +
+  scale_fill_manual(values = c("mediumblue", "#DA020E")) +
+  labs(
+    x = "Species",
+    y = "Body mass in grams"
+  )
+```
+
+
+
+
+
+
+
+
+
+
