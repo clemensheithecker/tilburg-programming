@@ -6,6 +6,7 @@ This respository contains my notes and solved exercises from the course _Program
 
 This repository is sectioned into several modules by topic:
 
+- [Module 1](/module-1/)—Reading data
 - [Module 2](/module-2/)—Data Wrangling with dplyr
 - [Module 3](/module-3/)—Data Wrangling (merging and wide-long transformations)
 - [Module 4](/module-4/)—Functions

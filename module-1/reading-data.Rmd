@@ -1,0 +1,209 @@
+---
+title: "Reading Data"
+author: "Clemens S. Heithecker"
+subtitle: "Module 1"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Setup
+
+In this module we use the tidyverse package to manipulate data frames. We will
+also use the readxl package to read Excel files.
+
+```{r message = FALSE, warning = FALSE}
+library(readxl)
+library(tidyverse)
+```
+
+# Read CSV files
+
+Let's start off by reading the content of the **CSV* file `people.csv`. This
+file contains a list of people and their corresponding age.
+
+Use the command `data_frame <- read.csv("path/file_name.csv")`, where
+`data_frame` is the name you want to call the resulting data frame and
+`path/file_name.csv` the file name including the path of the CSV file you want
+to read in.
+
+*Note*: Some CSV files do not use a comma as a delimiter. For example, some
+European regions use a semicolon (";") to separate values. In this case, use the
+function `read.csv2()` instead of `read.csv()`.
+
+# Exercise 1—Reading a CSV File
+
+Read the file `people.csv` from the data folder and call the data frame
+"people".
+
+```{r}
+people <- read.csv("data/people.csv")
+```
+
+By typing `people` we can view the data. Alternatively, you can use the
+`print()` function.
+
+```{r}
+people
+```
+
+To get an impression of the data we can either use the `head(data_frame)` or the
+`tail(data_frame)` function. These functions return the first or last few rows
+of a given data frame.
+
+```{r}
+head(people)
+```
+
+```{r}
+tail(people)
+```
+
+The function `read.csv2()` allows for an optional argument to specify the
+separator or delimiter.
+
+```{r}
+people <- read.csv2("data/people.csv", sep = ",")
+
+people
+```
+
+# Read Excel Files
+
+An **Excel** file is another common data file format. We can load Excel files
+using the `read_excel()` function from the `readxl` package. We already imported
+the package at the start of the document.
+
+Let's read the `colors.xlsx` file and assign it to a new data frame called
+`colors`. Then, we can use the `head()` function to check out the first 5 rows
+of the new data frame.
+
+```{r}
+colors <- read_excel("data/colors.xlsx")
+
+colors
+```
+
+Looking at the data, we see that the Excel sheet is read into a new data frame
+including empty rows. we can repair this using the package `dplyr` which is part
+of the `tidyverse` package but we can also use the `skip` argument inside the
+`read_excel` function. In this case, we do not want to read the first 4 rows,
+so we should add `skip = 4` to our function call.
+
+```{r}
+colors <- read_excel("data/colors.xlsx", skip = 4)
+
+head(colors)
+```
+
+## Reading Separate Sheets
+
+If you have opened the Excel sheet, you might have noticed that it has two
+worksheets. We only read the first sheet, but we can also read the second
+worksheet.
+
+```{r}
+colors_light <- read_excel("data/colors.xlsx", sheet = "400", skip = 4)
+
+head(colors_light)
+```
+
+*Note*: Instead of `sheet = "400"` we could have used `sheet = 2` to select the
+second sheet of the Excel file.
+
+# Writing Data to a File
+
+It is also possible to write a data frame as a CSV file by using the command
+`write.csv()` (or `write.csv2()`). This is not often needed becuase all the data
+editing is reproducible within the script. But sometimes you may want to write
+your data as a CSV file and you can do that like the following example:
+
+```{r}
+write.csv(colors, file = "data/colors.csv")
+```
+
+# Data Structures
+
+In R there are only a few common types of data:
+
+- `character` (string)
+- `numeric` (real numbers)
+- `integer` (integer numbers)
+- `complex` (complex numbers)
+- `logical` (binary `TRUE` or `FALSE` or `NA`)
+- `factor` (categorical data, e.g. *male* and *female*)
+
+Using the command `str()` you can get the structure of a given data frame.
+
+Let's look at an example. First, read in the `gender.csv` file and assign it to
+a new data frame called `gender`.
+
+```{r}
+gender <- read.csv("data/gender.csv")
+
+gender
+```
+
+Now check the structure of the data frame `gender`.
+
+```{r}
+str(gender)
+```
+
+We can see that the `gender` column within the `gender` data frame has a data
+type of *character* and the `number` column is of type *intege*. 
+
+## Changing the Structure of a Data Frame
+
+We can change the data structure of variables in several ways.
+
+Suppose we want to change the variable `gender` into a string of characters.
+
+```{r}
+gender$gender <- as.character(gender$gender)
+```
+
+And now suppose we want to change the `number` column into a factor.
+
+```{r}
+gender$number <- as.factor(gender$number)
+```
+
+Let's call the `str()` function again to see how the data structures changed.
+
+```{r}
+str(gender)
+```
+
+*Important note*: To change a factor variable to a numeric variable, we first
+need to convert it into a character variable.
+
+```{r}
+gender$number2 <- as.numeric(as.character(gender$number))
+
+gender
+```
+
+# Data Summary
+
+We can use the `summary()` function to calculate summary statistics for each
+variable or column of a data frame. For example:
+
+```{r}
+summary(people)
+```
+
+# Read RDS Files
+
+The RDS file is a special data format specific to R. You can load in data from a
+RDS file using the `readRDS` function.
+
+```{r}
+people_rds <- readRDS("data/people.rds")
+
+summary(people_rds)
+```
+
+
+
+
