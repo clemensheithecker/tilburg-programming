@@ -1,4 +1,4 @@
-# Introduction to Programming Notes
+# Programming in R and Python Course Notes
 
 I took these notes and solved the exercises in the notebooks when taking the course _Programming in R and Python_ at [Tilburg University](https://www.tilburguniversity.edu/) as an undergraduate Economics student.
 
@@ -6,6 +6,7 @@ I took these notes and solved the exercises in the notebooks when taking the cou
 
 This repository is sectioned into several modules by topic:
 
+- [Module 3](/module-3/)—Data Wrangling
 - [Module 4](/module-4/)—Functions
 - [Module 5](/module-5/)—Simulation-Based Statistics
 
